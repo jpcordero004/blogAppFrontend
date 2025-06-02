@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { apiFetch } from '../utils/api';
 
+const API_BASE = process.env.REACT_APP_API_BASE_URL;
+
 const Home = () => {
     const [posts, setPosts] = useState([]);
     const [error, setError] = useState('');
@@ -11,7 +13,7 @@ const Home = () => {
         setLoading(true);
         setError('');
         try {
-            const data = await apiFetch('http://localhost:5000/api/posts');
+            const data = await apiFetch('/api/posts');
             setPosts(data);
         } catch (err) {
             setError(err.message);
