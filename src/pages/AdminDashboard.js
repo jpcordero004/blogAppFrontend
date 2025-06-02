@@ -14,7 +14,7 @@ const AdminDashboard = () => {
         setLoading(true);
         setError('');
         try {
-            const res = await apiFetch('http://localhost:5000/api/posts', 'GET', null, token);
+            const res = await apiFetch('/api/posts', 'GET', null, token);
             setPosts(res);
         } catch (err) {
             setError(err.message);
@@ -32,7 +32,7 @@ const AdminDashboard = () => {
     const handleDelete = async (id) => {
         if (!window.confirm('Are you sure you want to delete this post?')) return;
         try {
-            await apiFetch(`http://localhost:5000/api/posts/${id}`, 'DELETE', null, token);
+            await apiFetch(`/api/posts/${id}`, 'DELETE', null, token);
             setSuccessMsg('Post deleted successfully.');
             fetchAllPosts();
             setTimeout(() => setSuccessMsg(''), 3000);
@@ -97,7 +97,9 @@ const AdminDashboard = () => {
                             }}
                         >
                             <h3 style={{ margin: '0 0 0.5rem' }}>{post.title}</h3>
-                            <p style={{ margin: '0 0 1rem' }}>{post.content.substring(0, 150)}{post.content.length > 150 ? '...' : ''}</p>
+                            <p style={{ margin: '0 0 1rem' }}>
+                                {post.content.substring(0, 150)}{post.content.length > 150 ? '...' : ''}
+                            </p>
                             <p style={{ fontSize: '0.85rem', color: '#555', marginBottom: '1rem' }}>
                                 Posted by: <strong>{post.author?.username || 'Unknown'}</strong> on {new Date(post.createdAt).toLocaleDateString()}
                             </p>
