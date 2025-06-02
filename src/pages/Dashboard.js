@@ -12,16 +12,16 @@ const Dashboard = () => {
     const fetchPosts = useCallback(async () => {
         if (!user) return;
 
-        try {
-            const url =
-                user.role === 'admin'
-                    ? 'http://localhost:5000/api/posts'
-                    : `http://localhost:5000/api/posts/user/${user.id}`;
+        // Fix template literal, and always use relative URLs
+        const url = user.role === 'admin'
+            ? '/api/posts'
+            : `/api/posts/user/${user.id || user._id}`;  // fallback to user._id if user.id undefined
 
+        try {
             const res = await apiFetch(url, 'GET', null, token);
             setPosts(res);
         } catch (err) {
-            setError(err.message);
+            setError(err.message || 'Failed to fetch posts');
         }
     }, [user, token]);
 
@@ -29,28 +29,26 @@ const Dashboard = () => {
         fetchPosts();
     }, [fetchPosts]);
 
-    if (!user) {
-        return <p>Loading user info...</p>;
-    }
-
-    const handleChange = e => {
+    const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = async e => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+
+        // Use relative URLs only
+        const url = editingId ? `/api/posts/${editingId}` : '/api/posts';
+
+        const method = editingId ? 'PUT' : 'POST';
+
         try {
-            if (editingId) {
-                await apiFetch(`http://localhost:5000/api/posts/${editingId}`, 'PUT', form, token);
-                setEditingId(null);
-            } else {
-                await apiFetch('http://localhost:5000/api/posts', 'POST', form, token);
-            }
+            await apiFetch(url, method, form, token);
             setForm({ title: '', content: '' });
+            setEditingId(null);
             fetchPosts();
         } catch (err) {
-            setError(err.message);
+            setError(err.message || 'Error submitting post');
         }
     };
 
@@ -59,15 +57,23 @@ const Dashboard = () => {
         setEditingId(post._id);
     };
 
+    const handleCancel = () => {
+        setForm({ title: '', content: '' });
+        setEditingId(null);
+        setError('');
+    };
+
     const handleDelete = async (id) => {
         if (!window.confirm('Are you sure you want to delete this post?')) return;
         try {
-            await apiFetch(`http://localhost:5000/api/posts/${id}`, 'DELETE', null, token);
+            await apiFetch(`/api/posts/${id}`, 'DELETE', null, token);
             fetchPosts();
         } catch (err) {
-            alert(err.message);
+            alert(err.message || 'Error deleting post');
         }
     };
+
+    if (!user) return <p>Loading user info...</p>;
 
     return (
         <div style={{ maxWidth: 700, margin: 'auto', padding: '1rem' }}>
@@ -95,14 +101,7 @@ const Dashboard = () => {
                     {editingId ? 'Update Post' : 'Create Post'}
                 </button>
                 {editingId && (
-                    <button
-                        type="button"
-                        onClick={() => {
-                            setEditingId(null);
-                            setForm({ title: '', content: '' });
-                            setError('');
-                        }}
-                    >
+                    <button type="button" onClick={handleCancel}>
                         Cancel
                     </button>
                 )}
@@ -131,13 +130,10 @@ const Dashboard = () => {
                                 By {post.author.username} — {new Date(post.createdAt).toLocaleDateString()}
                             </p>
 
-                            {(post.author._id === user.id || user.role === 'admin') && (
+                            {(post.author._id === (user.id || user._id) || user.role === 'admin') && (
                                 <div style={{ marginTop: '0.5rem' }}>
-                                    {post.author._id === user.id && (
-                                        <button
-                                            onClick={() => handleEdit(post)}
-                                            style={{ marginRight: '0.5rem' }}
-                                        >
+                                    {post.author._id === (user.id || user._id) && (
+                                        <button onClick={() => handleEdit(post)} style={{ marginRight: '0.5rem' }}>
                                             Edit
                                         </button>
                                     )}
