@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiFetch } from '../utils/api';
 
+const API_BASE = process.env.REACT_APP_API_BASE_URL;
+
 const Register = () => {
     const navigate = useNavigate();
     const [form, setForm] = useState({ username: '', email: '', password: '' });
@@ -15,7 +17,7 @@ const Register = () => {
         setError('');
         setLoading(true);
         try {
-            await apiFetch('http://localhost:5000/api/register', 'POST', form);
+            await apiFetch('/api/register', 'POST', form);
             navigate('/login');
         } catch (err) {
             setError(err.message);
