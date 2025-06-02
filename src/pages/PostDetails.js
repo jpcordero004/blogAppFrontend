@@ -15,7 +15,7 @@ const PostDetails = () => {
     useEffect(() => {
         const fetchPost = async () => {
             try {
-                const data = await apiFetch(`http://localhost:5000/api/posts/${id}`);
+                const data = await apiFetch(`/api/posts/${id}`);
                 setPost(data);
             } catch (err) {
                 setError(err.message);
@@ -24,7 +24,7 @@ const PostDetails = () => {
 
         const fetchComments = async () => {
             try {
-                const data = await apiFetch(`http://localhost:5000/api/posts/${id}/comments`);
+                const data = await apiFetch(`/api/posts/${id}/comments`);
                 setComments(data);
             } catch (err) {
                 console.error('Failed to load comments:', err.message);
@@ -41,7 +41,7 @@ const PostDetails = () => {
 
         try {
             const comment = await apiFetch(
-                `http://localhost:5000/api/posts/${id}/comments`,
+                `/api/posts/${id}/comments`,
                 'POST',
                 { text: newComment },
                 token
@@ -58,7 +58,7 @@ const PostDetails = () => {
         if (!window.confirm('Are you sure you want to delete this comment?')) return;
 
         try {
-            await apiFetch(`http://localhost:5000/api/posts/comment/${commentId}`, 'DELETE', null, token);
+            await apiFetch(`/api/posts/comment/${commentId}`, 'DELETE', null, token);
             setComments(comments.filter(c => c._id !== commentId));
         } catch (err) {
             alert('Failed to delete comment: ' + err.message);
