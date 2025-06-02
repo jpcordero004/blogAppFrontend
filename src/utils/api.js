@@ -1,6 +1,10 @@
-const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const BASE_URL = process.env.REACT_APP_API_URL;
 
 export const apiFetch = async (url, method = 'GET', data = null, token = null) => {
+    if (!BASE_URL) {
+        throw new Error('REACT_APP_API_URL is not defined in your environment variables');
+    }
+
     const options = {
         method,
         headers: { 'Content-Type': 'application/json' },
