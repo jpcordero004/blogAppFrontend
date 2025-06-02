@@ -18,7 +18,7 @@ const Login = () => {
         setError('');
         setLoading(true);
         try {
-            const data = await apiFetch('http://localhost:5000/api/login', 'POST', form);
+            const data = await apiFetch('/api/login', 'POST', form);
             login(data.user, data.token);
             navigate('/');
         } catch (err) {
